@@ -1,3 +1,4 @@
+import 'package:demoflutter/common_widgets/show_alert_dialog.dart';
 import 'package:demoflutter/service/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,17 @@ class HomePage extends StatelessWidget {
     }
   }
 
+  Future<void> confirmSignOut(BuildContext context) async {
+    final didRequestSignOut = await showAlertDialog(context,
+        title: "Logout",
+        content: "Are you sure that you want to logout",
+        defaultActionText: "OK",
+        cancelActionText: "No");
+    if (didRequestSignOut == true) {
+      _logoutAnonymous();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +36,7 @@ class HomePage extends StatelessWidget {
         title: Text("Home Page"),
         actions: <Widget>[
           ElevatedButton(
-              onPressed: () => _logoutAnonymous(),
+              onPressed: () => confirmSignOut(context),
               child: const Text(
                 "Logout",
                 style: TextStyle(fontSize: 20.0, color: Colors.white),
