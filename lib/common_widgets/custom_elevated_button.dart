@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class ElevatedButtonCustom extends StatelessWidget {
   final Widget child;
   final Color color;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final double borderRadius;
   final double height;
   ElevatedButtonCustom(

@@ -1,9 +1,7 @@
+import 'package:demoflutter/app.sign_in/email_sign_in_page.dart';
 import 'package:demoflutter/app.sign_in/sign_in_button.dart';
 import 'package:demoflutter/app.sign_in/social_sign_in_button.dart';
-import 'package:demoflutter/common_widgets/custom_elevated_button.dart';
 import 'package:demoflutter/service/auth.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -34,6 +32,11 @@ class SignInPage extends StatelessWidget {
       print(e.toString());
     }
   }
+  void _signInWithEmail(BuildContext  context){
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (context) => EmailSignInPage(auth: auth,),fullscreenDialog: true)
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,12 +45,12 @@ class SignInPage extends StatelessWidget {
         title: const Text("Timer Tracker"),
         elevation: 10.0,
       ),
-      body: _buildContent(),
+      body: _buildContent(context),
       backgroundColor: Colors.grey[200],
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent(BuildContext context) {
     // underscore == private java
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -91,10 +94,10 @@ class SignInPage extends StatelessWidget {
             height: 8.0,
           ),
           SocialSignInButton(
-            text: "Sign In With Instagram",
+            text: "Sign In With email",
             color: Colors.pink.shade400,
             textColor: Colors.black,
-            onPressed: _signInWithGoogle,
+            onPressed: () => _signInWithEmail(context),
             borderRadius: 19.0,
             height: 50,
             assertName: 'image/instagram-48.png',

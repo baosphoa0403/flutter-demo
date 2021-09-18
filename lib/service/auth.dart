@@ -9,6 +9,8 @@ abstract class AuthBase {
   Future<void> signOut();
   Future<User?> signInWithGoogle();
   Future<User?> signInWithFacebook();
+  Future<User?> signInWithEmailPassword(String email, String password);
+  Future<User?> createUserWithEmailAndPassword(String email, String password);
 }
 
 class Auth extends AuthBase {
@@ -53,6 +55,22 @@ class Auth extends AuthBase {
       throw FirebaseAuthException(
           code: "Error_Aborted_By_User", message: "Sign in aborted by user");
     }
+  }
+
+  @override
+  Future<User?> signInWithEmailPassword(String email, String password) async {
+    final userCredential = await _firebaseAuth.signInWithCredential(
+      EmailAuthProvider.credential(email: email, password: password),
+    );
+    return userCredential.user;
+  }
+
+  @override
+  Future<User?> createUserWithEmailAndPassword(
+      String email, String password) async {
+    final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email, password: password);
+    return userCredential.user;
   }
 
   @override
