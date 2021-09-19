@@ -10,7 +10,7 @@ class SocialSignInButton extends ElevatedButtonCustom {
       required String text,
       required Color color,
       required Color textColor,
-      required VoidCallback onPressed,
+      required VoidCallback? onPressed,
       required double borderRadius,
       required double height
       })

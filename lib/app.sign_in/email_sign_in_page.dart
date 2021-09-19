@@ -19,7 +19,7 @@ class EmailSignInPage extends StatelessWidget {
               child: EmailSignInForm(
             auth: auth,
           )),
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
         ),
       ),
     );

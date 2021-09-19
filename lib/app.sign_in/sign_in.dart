@@ -1,41 +1,69 @@
 import 'package:demoflutter/app.sign_in/email_sign_in_page.dart';
 import 'package:demoflutter/app.sign_in/sign_in_button.dart';
 import 'package:demoflutter/app.sign_in/social_sign_in_button.dart';
+import 'package:demoflutter/common_widgets/show_exception_diaglog.dart';
 import 'package:demoflutter/service/auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class SignInPage extends StatelessWidget {
+class SignInPage extends StatefulWidget {
   const SignInPage({Key? key, required this.auth}) : super(key: key);
   final AuthBase auth;
+  void _showSignInError(BuildContext context, Exception exception) {
+    showExceptionAlertDialog(context,
+        exception: exception, title: "Sign in Failed", deafaultActionTex: "ok");
+  }
 
-  Future<void> _signInAnonymous() async {
+  @override
+  _SignInPageState createState() => _SignInPageState();
+}
+
+class _SignInPageState extends State<SignInPage> {
+  bool _isLoading = false;
+  Future<void> _signInAnonymous(BuildContext context) async {
+    setState(() {
+      _isLoading = true;
+    });
     try {
-      await auth.signInAnonymous();
+      await widget.auth.signInAnonymous();
       // ignore: avoid_print
       // print(userCredencials);
-    } catch (e) {
-      print(e.toString());
+    } on Exception catch (e) {
+      widget._showSignInError(context, e);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
   // ignore: unused_element
-  Future<void> _signInGoogle() async {
+  Future<void> _signInGoogle(BuildContext context) async {
     try {
-      final user = await auth.signInWithGoogle();
+      setState(() {
+        _isLoading = true;
+      });
+      final user = await widget.auth.signInWithGoogle();
       print(user);
       // ignore: avoid_print
       // print(userCredencials);
-    } catch (e) {
+    } on Exception catch (e) {
       // ignore: avoid_print
-      print(e.toString());
+      widget._showSignInError(context, e);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
-  void _signInWithEmail(BuildContext  context){
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (context) => EmailSignInPage(auth: auth,),fullscreenDialog: true)
-    );
+
+  void _signInWithEmail(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (context) => EmailSignInPage(
+              auth: widget.auth,
+            ),
+        fullscreenDialog: true));
   }
 
   @override
@@ -58,10 +86,9 @@ class SignInPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          const Text(
-            "Sign In",
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 32.0, fontWeight: FontWeight.w600),
+          SizedBox(
+            child: _buildHeader(),
+            height: 50.0,
           ),
           const SizedBox(
             height: 8.0,
@@ -73,7 +100,7 @@ class SignInPage extends StatelessWidget {
             text: "Sign In With Google",
             color: Colors.white,
             textColor: Colors.black,
-            onPressed: () => {_signInGoogle()},
+            onPressed: _isLoading ? null : () => {_signInGoogle(context)},
             borderRadius: 19.0,
             height: 50,
             assertName: 'image/google-48.png',
@@ -85,7 +112,9 @@ class SignInPage extends StatelessWidget {
             text: "Sign In With facebook",
             color: const Color(0xFF334D92),
             textColor: Colors.black,
-            onPressed: () => { auth.signInWithFacebook()},
+            onPressed: _isLoading
+                ? null
+                : () => {widget.auth.signInWithFacebook(context)},
             borderRadius: 19.0,
             height: 50,
             assertName: 'image/facebook-48.png',
@@ -97,7 +126,7 @@ class SignInPage extends StatelessWidget {
             text: "Sign In With email",
             color: Colors.pink.shade400,
             textColor: Colors.black,
-            onPressed: () => _signInWithEmail(context),
+            onPressed: _isLoading ? null : () => _signInWithEmail(context),
             borderRadius: 19.0,
             height: 50,
             assertName: 'image/instagram-48.png',
@@ -114,7 +143,7 @@ class SignInPage extends StatelessWidget {
             text: "Go anonnymous",
             color: Colors.lime,
             textColor: Colors.black,
-            onPressed: () => _signInAnonymous(),
+            onPressed: _isLoading ? null : () => _signInAnonymous(context),
             borderRadius: 19.0,
             height: 50,
           ),
@@ -125,7 +154,16 @@ class SignInPage extends StatelessWidget {
 
   void hello() {}
 
-  void _signInWithGoogle() {
-    print("hello world");
+  Widget _buildHeader() {
+    if (_isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    return const Text(
+      "Sign In",
+      textAlign: TextAlign.center,
+      style: TextStyle(fontSize: 32.0, fontWeight: FontWeight.w600),
+    );
   }
 }
