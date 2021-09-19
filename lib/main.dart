@@ -4,7 +4,7 @@ import 'package:demoflutter/service/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-void main () async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(const MyApp());
@@ -12,7 +12,7 @@ void main () async {
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     // final signInPage = SignInPage();
@@ -20,7 +20,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: "Timer Tracker",
         theme: ThemeData(primarySwatch: Colors.indigo),
-        home: LandingPgae(auth: Auth())
-        );
+        home: LandingPgae(auth: Auth()));
   }
 }

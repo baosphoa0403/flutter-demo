@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:demoflutter/app.sign_in/validator.dart';
 import 'package:demoflutter/common_widgets/form_submit_button.dart';
 import 'package:demoflutter/common_widgets/show_alert_dialog.dart';
+import 'package:demoflutter/common_widgets/show_exception_diaglog.dart';
 import 'package:demoflutter/service/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -31,6 +33,16 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
   EmailSignInFormType _formType = EmailSignInFormType.register;
   bool _submitted = false;
   bool _loading = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    print("dispose cancel");
+    super.dispose();
+  }
 
   List<Widget> _buildChildren() {
     final primaryText =
@@ -133,13 +145,9 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
         print(user);
       }
       Navigator.of(context).pop();
-    } catch (e) {
-      showAlertDialog(
-        context,
-        title: "Sign in Failed",
-        content: e.toString(),
-        defaultActionText: "ok",
-      );
+    } on FirebaseAuthException catch (e) {
+      showExceptionAlertDialog(context,
+          exception: e, title: "Sign in Failed", deafaultActionTex: "ok");
     } finally {
       setState(() {
         _loading = false;
