@@ -23,3 +23,9 @@ class MyApp extends StatelessWidget {
         home: LandingPgae(auth: Auth()));
   }
 }
+
+// 1.introduce Bloc
+
+// 2.refactor SignInPage
+
+//3. refactor EmailSignForm 
