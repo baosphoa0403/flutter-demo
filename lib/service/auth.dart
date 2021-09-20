@@ -10,7 +10,7 @@ abstract class AuthBase {
   Future<User?> signInAnonymous();
   Future<void> signOut();
   Future<User?> signInWithGoogle();
-  Future<User?> signInWithFacebook(BuildContext context);
+  Future<User?> signInWithFacebook();
   Future<User?> signInWithEmailPassword(String email, String password);
   Future<User?> createUserWithEmailAndPassword(String email, String password);
 }
@@ -25,7 +25,7 @@ class Auth extends AuthBase {
   @override
   Future<User?> signInAnonymous() async {
     final userCredential = await _firebaseAuth.signInAnonymously();
-    return userCredential.user;
+    return userCredential.user!;
   }
 
   @override
@@ -81,9 +81,8 @@ class Auth extends AuthBase {
   }
 
   @override
-  Future<User?> signInWithFacebook(BuildContext context) async {
-    try {
-      final LoginResult result = await _facebookAuth.login(
+  Future<User?> signInWithFacebook() async {
+    final LoginResult result = await _facebookAuth.login(
         permissions: [
           'public_profile',
           'email',
@@ -110,10 +109,5 @@ class Auth extends AuthBase {
       } else {
         throw UnimplementedError();
       }
-    } on Exception catch (e) {
-      showExceptionAlertDialog(context,
-          exception: e, title: "Sign in Failed", deafaultActionTex: "ok");
-      // print(e.toString());
-    }
   }
 }

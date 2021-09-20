@@ -10,10 +10,22 @@ import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 class SignInPage extends StatelessWidget {
+  const SignInPage({Key? key, required this.bloc}) : super(key: key);
+  final SignInBloc bloc;
+
   static Widget create(BuildContext context) {
+    final auth = Provider.of<AuthBase>(context, listen: false);
     return Provider<SignInBloc>(
-      create: (_) => SignInBloc(),
-      child: SignInPage(),
+      // lất lớp provider bọc child vs builder
+      create: (_) => SignInBloc(auth: auth), // builer nè
+      dispose: (_, bloc) => bloc.dispose(),
+      child: Consumer<SignInBloc>(
+        // do dùng Provider.of<T>(context) bị lặp lại code vì z dùng Consumer để pass Object qua constructor
+        builder: (_, bloc, __) => SignInPage(
+          // chuyền bloc zo
+          bloc: bloc,
+        ),
+      ), // child
     );
   }
 
@@ -24,48 +36,28 @@ class SignInPage extends StatelessWidget {
 
   // bool _isLoading = false;
   Future<void> _signInAnonymous(BuildContext context) async {
-    final bloc = Provider.of<SignInBloc>(context, listen: false);
-    bloc.setIsLoading(true);
-    final auth = Provider.of<AuthBase>(context, listen: false);
     try {
-      await auth.signInAnonymous();
-      // ignore: avoid_print
-      // print(userCredencials);
+      await bloc.signInAnonymous();
     } on Exception catch (e) {
       _showSignInError(context, e);
-    } finally {
-      bloc.setIsLoading(false);
     }
   }
 
   // ignore: unused_element
   Future<void> _signInGoogle(BuildContext context) async {
-    final bloc = Provider.of<SignInBloc>(context, listen: false);
-    bloc.setIsLoading(true);
-    final auth = Provider.of<AuthBase>(context, listen: false);
     try {
-      final user = await auth.signInWithGoogle();
-      print(user);
-      // ignore: avoid_print
-      // print(userCredencials);
+      await bloc.signInWithGoogle();
     } on Exception catch (e) {
-      // ignore: avoid_print
       _showSignInError(context, e);
-    } finally {
-      bloc.setIsLoading(false);
     }
   }
 
   Future<void> _signInFacebook(BuildContext context) async {
-    final bloc = Provider.of<SignInBloc>(context, listen: false);
-    bloc.setIsLoading(true);
-    final auth = Provider.of<AuthBase>(context, listen: false);
     try {
-      await auth.signInWithFacebook(context);
+      await bloc.signInWithFacebook();
     } on Exception catch (e) {
-      _showSignInError(context, e);
-    } finally {
-      bloc.setIsLoading(false);
+      showExceptionAlertDialog(context,
+          exception: e, title: "Sign in Failed", deafaultActionTex: "ok");
     }
   }
 
