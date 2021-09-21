@@ -17,7 +17,7 @@ class SignInPage extends StatelessWidget {
     final auth = Provider.of<AuthBase>(context, listen: false);
     return Provider<SignInBloc>(
       // lất lớp provider bọc child vs builder
-      create: (_) => SignInBloc(auth: auth), // builer nè
+      create: (_) => SignInBloc(auth: auth), // builder nè
       dispose: (_, bloc) => bloc.dispose(),
       child: Consumer<SignInBloc>(
         // do dùng Provider.of<T>(context) bị lặp lại code vì z dùng Consumer để pass Object qua constructor

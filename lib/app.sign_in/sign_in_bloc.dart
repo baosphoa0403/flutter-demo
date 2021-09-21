@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class SignInBloc {
   SignInBloc({required this.auth});
-  var isLoading = false;
   final AuthBase auth;
   // 1 cái quản lý event, đảm nhận nhiệm vụ nhận event từ UI
   final StreamController<bool> _isLoadingController = StreamController<bool>();
