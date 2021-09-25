@@ -3,6 +3,7 @@ import 'package:demoflutter/app.sign_in/sign_in.dart';
 import 'package:demoflutter/service/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,9 +18,24 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // final signInPage = SignInPage();
 
-    return MaterialApp(
-        title: "Timer Tracker",
-        theme: ThemeData(primarySwatch: Colors.indigo),
-        home: LandingPgae(auth: Auth()));
+    return Provider<AuthBase>(
+      create: (context) => Auth(),
+      child: MaterialApp(
+          title: "Timer Tracker",
+          theme: ThemeData(primarySwatch: Colors.indigo),
+          home: LandingPage()),
+    );
   }
 }
+
+// 1.introduce Bloc
+
+// 2.refactor SignInPage
+
+//3. refactor EmailSignForm 
+
+// advantage working with Blocs
+
+// separate business logic from: 
+//- layout code
+//- implementation details of external services

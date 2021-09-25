@@ -1,4 +1,5 @@
 import 'package:demoflutter/app.sign_in/email_sign_in_page.dart';
+import 'package:demoflutter/app.sign_in/sign_in_manage.dart';
 import 'package:demoflutter/app.sign_in/sign_in_button.dart';
 import 'package:demoflutter/app.sign_in/social_sign_in_button.dart';
 import 'package:demoflutter/common_widgets/show_exception_diaglog.dart';
@@ -6,64 +7,75 @@ import 'package:demoflutter/service/auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 
-class SignInPage extends StatefulWidget {
-  const SignInPage({Key? key, required this.auth}) : super(key: key);
-  final AuthBase auth;
+class SignInPage extends StatelessWidget {
+  const SignInPage({Key? key, required this.manage, required this.isLoading})
+      : super(key: key);
+  final SignInManage manage;
+  final bool isLoading;
+  static Widget create(BuildContext context) {
+    final auth = Provider.of<AuthBase>(context, listen: false);
+    return ChangeNotifierProvider<ValueNotifier<bool>>(
+      // register update
+      create: (_) => ValueNotifier<bool>(
+          false), //ValueNotifier là sub class of ChageNotifier
+      // dùng changeNotifier cho object còn valueNotifier cho primitive
+      child: Consumer<ValueNotifier<bool>>(
+        // use consumer
+        builder: (_, isLoading, __) => Provider<SignInManage>(
+          //builder will call ValueNotifier.value change
+          // nhà cung cấp
+          // lất lớp provider bọc child vs builder
+          create: (_) =>
+              SignInManage(auth: auth, isLoading: isLoading), // builder nè
+          child: Consumer<SignInManage>(
+            // do dùng Provider.of<T>(context) bị lặp lại code vì z dùng Consumer để pass Object qua constructor
+            builder: (_, manage, __) => SignInPage(
+              // chuyền manage zo
+              manage: manage, isLoading: isLoading.value,
+            ),
+          ), // child
+        ),
+      ),
+    );
+  }
+
   void _showSignInError(BuildContext context, Exception exception) {
     showExceptionAlertDialog(context,
         exception: exception, title: "Sign in Failed", deafaultActionTex: "ok");
   }
 
-  @override
-  _SignInPageState createState() => _SignInPageState();
-}
-
-class _SignInPageState extends State<SignInPage> {
-  bool _isLoading = false;
+  // bool _isLoading = false;
   Future<void> _signInAnonymous(BuildContext context) async {
-    setState(() {
-      _isLoading = true;
-    });
     try {
-      await widget.auth.signInAnonymous();
-      // ignore: avoid_print
-      // print(userCredencials);
+      await manage.signInAnonymous();
     } on Exception catch (e) {
-      widget._showSignInError(context, e);
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      _showSignInError(context, e);
     }
   }
 
   // ignore: unused_element
   Future<void> _signInGoogle(BuildContext context) async {
     try {
-      setState(() {
-        _isLoading = true;
-      });
-      final user = await widget.auth.signInWithGoogle();
-      print(user);
-      // ignore: avoid_print
-      // print(userCredencials);
+      await manage.signInWithGoogle();
     } on Exception catch (e) {
-      // ignore: avoid_print
-      widget._showSignInError(context, e);
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      _showSignInError(context, e);
+    }
+  }
+
+  Future<void> _signInFacebook(BuildContext context) async {
+    try {
+      await manage.signInWithFacebook();
+    } on Exception catch (e) {
+      showExceptionAlertDialog(context,
+          exception: e, title: "Sign in Failed", deafaultActionTex: "ok");
     }
   }
 
   void _signInWithEmail(BuildContext context) {
     Navigator.of(context).push(MaterialPageRoute<void>(
-        builder: (context) => EmailSignInPage(
-              auth: widget.auth,
-            ),
-        fullscreenDialog: true));
+        builder: (context) => EmailSignInPage(), fullscreenDialog: true));
   }
 
   @override
@@ -78,6 +90,7 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
+// snapshot has connectionState, hasError/Error, hasData/data
   Widget _buildContent(BuildContext context) {
     // underscore == private java
     return Padding(
@@ -87,7 +100,7 @@ class _SignInPageState extends State<SignInPage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           SizedBox(
-            child: _buildHeader(),
+            child: _buildHeader(isLoading),
             height: 50.0,
           ),
           const SizedBox(
@@ -100,7 +113,7 @@ class _SignInPageState extends State<SignInPage> {
             text: "Sign In With Google",
             color: Colors.white,
             textColor: Colors.black,
-            onPressed: _isLoading ? null : () => {_signInGoogle(context)},
+            onPressed: isLoading ? null : () => {_signInGoogle(context)},
             borderRadius: 19.0,
             height: 50,
             assertName: 'image/google-48.png',
@@ -112,9 +125,7 @@ class _SignInPageState extends State<SignInPage> {
             text: "Sign In With facebook",
             color: const Color(0xFF334D92),
             textColor: Colors.black,
-            onPressed: _isLoading
-                ? null
-                : () => {widget.auth.signInWithFacebook(context)},
+            onPressed: isLoading ? null : () => {_signInFacebook(context)},
             borderRadius: 19.0,
             height: 50,
             assertName: 'image/facebook-48.png',
@@ -126,7 +137,7 @@ class _SignInPageState extends State<SignInPage> {
             text: "Sign In With email",
             color: Colors.pink.shade400,
             textColor: Colors.black,
-            onPressed: _isLoading ? null : () => _signInWithEmail(context),
+            onPressed: isLoading ? null : () => _signInWithEmail(context),
             borderRadius: 19.0,
             height: 50,
             assertName: 'image/instagram-48.png',
@@ -143,7 +154,7 @@ class _SignInPageState extends State<SignInPage> {
             text: "Go anonnymous",
             color: Colors.lime,
             textColor: Colors.black,
-            onPressed: _isLoading ? null : () => _signInAnonymous(context),
+            onPressed: isLoading ? null : () => _signInAnonymous(context),
             borderRadius: 19.0,
             height: 50,
           ),
@@ -154,8 +165,8 @@ class _SignInPageState extends State<SignInPage> {
 
   void hello() {}
 
-  Widget _buildHeader() {
-    if (_isLoading) {
+  Widget _buildHeader(bool isLoading) {
+    if (isLoading) {
       return const Center(
         child: CircularProgressIndicator(),
       );

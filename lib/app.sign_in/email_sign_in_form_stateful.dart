@@ -1,26 +1,21 @@
-import 'dart:io';
-
+import 'package:demoflutter/app.sign_in/email_sign_in_change_model.dart';
 import 'package:demoflutter/app.sign_in/validator.dart';
 import 'package:demoflutter/common_widgets/form_submit_button.dart';
-import 'package:demoflutter/common_widgets/show_alert_dialog.dart';
 import 'package:demoflutter/common_widgets/show_exception_diaglog.dart';
 import 'package:demoflutter/service/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-enum EmailSignInFormType { signIn, register }
-
-class EmailSignInForm extends StatefulWidget with EmailAndPasswordValidator {
-  final AuthBase auth;
-  EmailSignInForm({Key? key, required this.auth}) : super(key: key);
-
+class EmailSignInFormStateful extends StatefulWidget
+    with EmailAndPasswordValidator {
   @override
   _EmailSignInFormState createState() => _EmailSignInFormState();
 }
 
-class _EmailSignInFormState extends State<EmailSignInForm> {
-  // const EmailSignInForm({Key? key}) : super(key: key);
+class _EmailSignInFormState extends State<EmailSignInFormStateful> {
+  // const EmailSignInFormStateful({Key? key}) : super(key: key);
 
   final TextEditingController _emailController = TextEditingController();
   String get _email => _emailController.text;
@@ -126,21 +121,21 @@ class _EmailSignInFormState extends State<EmailSignInForm> {
   }
 
   void _submit() async {
-    print("submit-call");
+    // build context always have in stateFull but need to passed inside stateless widget
     setState(() {
       _submitted = true;
       _loading = true;
     });
     try {
       await Future.delayed(Duration(seconds: 3));
+      final auth = Provider.of<AuthBase>(context, listen: false);
       if (_formType == EmailSignInFormType.signIn) {
-        final user =
-            await widget.auth.signInWithEmailPassword(_email, _password);
+        final user = await auth.signInWithEmailPassword(_email, _password);
         // ignore: avoid_print
         print(user);
       } else {
         final user =
-            await widget.auth.createUserWithEmailAndPassword(_email, _password);
+            await auth.createUserWithEmailAndPassword(_email, _password);
         // ignore: avoid_print
         print(user);
       }
