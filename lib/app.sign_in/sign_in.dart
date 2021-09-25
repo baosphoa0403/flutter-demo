@@ -1,5 +1,5 @@
 import 'package:demoflutter/app.sign_in/email_sign_in_page.dart';
-import 'package:demoflutter/app.sign_in/sign_in_bloc.dart';
+import 'package:demoflutter/app.sign_in/sign_in_manage.dart';
 import 'package:demoflutter/app.sign_in/sign_in_button.dart';
 import 'package:demoflutter/app.sign_in/social_sign_in_button.dart';
 import 'package:demoflutter/common_widgets/show_exception_diaglog.dart';
@@ -10,22 +10,34 @@ import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 class SignInPage extends StatelessWidget {
-  const SignInPage({Key? key, required this.bloc}) : super(key: key);
-  final SignInBloc bloc;
-
+  const SignInPage({Key? key, required this.manage, required this.isLoading})
+      : super(key: key);
+  final SignInManage manage;
+  final bool isLoading;
   static Widget create(BuildContext context) {
     final auth = Provider.of<AuthBase>(context, listen: false);
-    return Provider<SignInBloc>(
-      // lất lớp provider bọc child vs builder
-      create: (_) => SignInBloc(auth: auth), // builder nè
-      dispose: (_, bloc) => bloc.dispose(),
-      child: Consumer<SignInBloc>(
-        // do dùng Provider.of<T>(context) bị lặp lại code vì z dùng Consumer để pass Object qua constructor
-        builder: (_, bloc, __) => SignInPage(
-          // chuyền bloc zo
-          bloc: bloc,
+    return ChangeNotifierProvider<ValueNotifier<bool>>(
+      // register update
+      create: (_) => ValueNotifier<bool>(
+          false), //ValueNotifier là sub class of ChageNotifier
+      // dùng changeNotifier cho object còn valueNotifier cho primitive
+      child: Consumer<ValueNotifier<bool>>(
+        // use consumer
+        builder: (_, isLoading, __) => Provider<SignInManage>(
+          //builder will call ValueNotifier.value change
+          // nhà cung cấp
+          // lất lớp provider bọc child vs builder
+          create: (_) =>
+              SignInManage(auth: auth, isLoading: isLoading), // builder nè
+          child: Consumer<SignInManage>(
+            // do dùng Provider.of<T>(context) bị lặp lại code vì z dùng Consumer để pass Object qua constructor
+            builder: (_, manage, __) => SignInPage(
+              // chuyền manage zo
+              manage: manage, isLoading: isLoading.value,
+            ),
+          ), // child
         ),
-      ), // child
+      ),
     );
   }
 
@@ -37,7 +49,7 @@ class SignInPage extends StatelessWidget {
   // bool _isLoading = false;
   Future<void> _signInAnonymous(BuildContext context) async {
     try {
-      await bloc.signInAnonymous();
+      await manage.signInAnonymous();
     } on Exception catch (e) {
       _showSignInError(context, e);
     }
@@ -46,7 +58,7 @@ class SignInPage extends StatelessWidget {
   // ignore: unused_element
   Future<void> _signInGoogle(BuildContext context) async {
     try {
-      await bloc.signInWithGoogle();
+      await manage.signInWithGoogle();
     } on Exception catch (e) {
       _showSignInError(context, e);
     }
@@ -54,7 +66,7 @@ class SignInPage extends StatelessWidget {
 
   Future<void> _signInFacebook(BuildContext context) async {
     try {
-      await bloc.signInWithFacebook();
+      await manage.signInWithFacebook();
     } on Exception catch (e) {
       showExceptionAlertDialog(context,
           exception: e, title: "Sign in Failed", deafaultActionTex: "ok");
@@ -68,28 +80,18 @@ class SignInPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = Provider.of<SignInBloc>(context,
-        listen: false); // khởi tạo bloc  <=== new
     return Scaffold(
       appBar: AppBar(
         title: const Text("Timer Tracker"),
         elevation: 10.0,
       ),
-      body: StreamBuilder<bool>(
-          // sử dụng StreamBuilder để lắng nghe Stream <=== new
-          stream: bloc
-              .isLoadingStream, // truyền stream của stateController vào để lắng nghe <=== new
-          initialData:
-              false, // mặc định là false ko cần check snapshot.connnectionState
-          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-            return _buildContent(context, snapshot.data!);
-          }),
+      body: _buildContent(context),
       backgroundColor: Colors.grey[200],
     );
   }
 
 // snapshot has connectionState, hasError/Error, hasData/data
-  Widget _buildContent(BuildContext context, bool isLoading) {
+  Widget _buildContent(BuildContext context) {
     // underscore == private java
     return Padding(
       padding: const EdgeInsets.all(16.0),

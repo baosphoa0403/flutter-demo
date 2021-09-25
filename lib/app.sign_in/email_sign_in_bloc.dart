@@ -1,16 +1,16 @@
 import 'dart:async';
 
-import 'package:demoflutter/app.sign_in/email_sign_in_model.dart';
+import 'package:demoflutter/app.sign_in/email_sign_in_change_model.dart';
 import 'package:demoflutter/service/auth.dart';
 
 class EmailSignInBloc {
   EmailSignInBloc({required this.auth});
   final AuthBase auth;
-  final StreamController<EmailSignInModel> _modelController =
-      StreamController<EmailSignInModel>();
+  final StreamController<EmailSignInChangeModel> _modelController =
+      StreamController<EmailSignInChangeModel>();
 
-  Stream<EmailSignInModel> get modelStream => _modelController.stream;
-  EmailSignInModel _model = EmailSignInModel();
+  Stream<EmailSignInChangeModel> get modelStream => _modelController.stream;
+  EmailSignInChangeModel _model = EmailSignInChangeModel(auth: Auth());
   void dispose() {
     _modelController.close();
   }
@@ -21,13 +21,12 @@ class EmailSignInBloc {
       EmailSignInFormType? formType,
       bool? isLoading,
       submitted}) {
-    _model = _model.copyWith(
+    _model.updateWith(
         email: email,
         formType: formType,
         isLoading: isLoading,
         password: password,
         submitted: submitted);
-    _modelController.add(_model);
   }
 
   void updateEmail(String email) => updateWith(email: email);

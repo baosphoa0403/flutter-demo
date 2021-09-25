@@ -1,6 +1,4 @@
-import 'package:demoflutter/app.sign_in/email_sign_in_bloc_base.dart';
-import 'package:demoflutter/app.sign_in/email_sign_in_form_stateful.dart';
-import 'package:demoflutter/service/auth.dart';
+import 'package:demoflutter/app.sign_in/email_sign_in_form_change_notifier.dart';
 import 'package:flutter/material.dart';
 
 class EmailSignInPage extends StatelessWidget {
@@ -14,7 +12,7 @@ class EmailSignInPage extends StatelessWidget {
       body: SingleChildScrollView(
         // responsive nè
         child: Padding(
-          child: Card(child: EmailSignInFormBlocBased.create(context)),
+          child: Card(child: EmailSignInFormChangeNotifier.create(context)),
           padding: const EdgeInsets.all(16.0),
         ),
       ),

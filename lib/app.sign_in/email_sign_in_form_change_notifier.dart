@@ -1,4 +1,3 @@
-import 'package:demoflutter/app.sign_in/email_sign_in_bloc.dart';
 import 'package:demoflutter/app.sign_in/email_sign_in_change_model.dart';
 import 'package:demoflutter/common_widgets/form_submit_button.dart';
 import 'package:demoflutter/common_widgets/show_exception_diaglog.dart';
@@ -10,18 +9,19 @@ import 'package:provider/provider.dart';
 
 // important use blocC with streams of immutable object
 // use ChangeNotifier with mutable object
-class EmailSignInFormBlocBased extends StatefulWidget {
-  final EmailSignInBloc bloc;
-  const EmailSignInFormBlocBased({Key? key, required this.bloc})
+class EmailSignInFormChangeNotifier extends StatefulWidget {
+  final EmailSignInChangeModel model; // nhà cung cấp
+  const EmailSignInFormChangeNotifier({Key? key, required this.model})
       : super(key: key);
 
   static Widget create(BuildContext context) {
     final auth = Provider.of<AuthBase>(context, listen: false);
-    return Provider<EmailSignInBloc>(
-      create: (_) => EmailSignInBloc(auth: auth),
-      child: Consumer<EmailSignInBloc>(
-        builder: (_, bloc, __) => EmailSignInFormBlocBased(
-          bloc: bloc,
+    return ChangeNotifierProvider<EmailSignInChangeModel>(
+      // class này có mixin là changeNotifier
+      create: (_) => EmailSignInChangeModel(auth: auth), // khởi tạo
+      child: Consumer<EmailSignInChangeModel>(
+        builder: (_, model, __) => EmailSignInFormChangeNotifier(
+          model: model,
         ),
       ),
     );
@@ -31,7 +31,7 @@ class EmailSignInFormBlocBased extends StatefulWidget {
   _EmailSignInFormState createState() => _EmailSignInFormState();
 }
 
-class _EmailSignInFormState extends State<EmailSignInFormBlocBased> {
+class _EmailSignInFormState extends State<EmailSignInFormChangeNotifier> {
   // const EmailSignInFormStateful({Key? key}) : super(key: key);
 
   final TextEditingController _emailController = TextEditingController();
@@ -39,7 +39,8 @@ class _EmailSignInFormState extends State<EmailSignInFormBlocBased> {
   final TextEditingController _passwordController = TextEditingController();
   final FocusNode _passwordFocusNode = FocusNode();
   // EmailSignInFormType _formType = EmailSignInFormType.register;
-
+  EmailSignInChangeModel get model =>
+      widget.model; // RECOMMEND USE GETTER IN STATEFUL
   @override
   void dispose() {
     _emailController.dispose();
@@ -49,14 +50,14 @@ class _EmailSignInFormState extends State<EmailSignInFormBlocBased> {
     super.dispose();
   }
 
-  List<Widget> _buildChildren(EmailSignInChangeModel model) {
+  List<Widget> _buildChildren() {
     return [
-      _buttonEmailTextField(model),
+      _buttonEmailTextField(),
       const SizedBox(
         height: 20,
         width: 20,
       ),
-      _buttonPasswordTextField(model),
+      _buttonPasswordTextField(),
       FormSubmitButton(
         text: model.primaryButtonText,
         onPressed: model.canSubmit ? _submit : null,
@@ -75,7 +76,7 @@ class _EmailSignInFormState extends State<EmailSignInFormBlocBased> {
     ];
   }
 
-  TextField _buttonPasswordTextField(EmailSignInChangeModel model) {
+  TextField _buttonPasswordTextField() {
     return TextField(
         decoration: InputDecoration(
             border: const OutlineInputBorder(),
@@ -88,12 +89,12 @@ class _EmailSignInFormState extends State<EmailSignInFormBlocBased> {
         controller: _passwordController,
         textInputAction: TextInputAction.done,
         focusNode: _passwordFocusNode,
-        onChanged: (password) => {widget.bloc.updatePassword(password)},
+        onChanged: (password) => {widget.model.updatePassword(password)},
         // {print("password" + password)},
         onEditingComplete: () => _submit());
   }
 
-  TextField _buttonEmailTextField(EmailSignInChangeModel model) {
+  TextField _buttonEmailTextField() {
     return TextField(
       decoration: InputDecoration(
           border: const OutlineInputBorder(),
@@ -109,7 +110,7 @@ class _EmailSignInFormState extends State<EmailSignInFormBlocBased> {
       controller: _emailController,
       focusNode: _emailFocusNode,
       onChanged: (email) => {
-        {widget.bloc.updateEmail(email)}
+        {model.updateEmail(email)}
       },
       onEditingComplete: () {
         final newFocus = model.emailValidator
@@ -124,7 +125,7 @@ class _EmailSignInFormState extends State<EmailSignInFormBlocBased> {
   void _submit() async {
     // build context always have in stateFull but need to passed inside stateless widget
     try {
-      await widget.bloc.submit();
+      await widget.model.submit();
       Navigator.of(context).pop();
     } on FirebaseAuthException catch (e) {
       showExceptionAlertDialog(context,
@@ -133,7 +134,7 @@ class _EmailSignInFormState extends State<EmailSignInFormBlocBased> {
   }
 
   void _toogleFormType(EmailSignInChangeModel model) {
-    widget.bloc.toogleFormType();
+    widget.model.toogleFormType();
     FocusScope.of(context).requestFocus(_emailFocusNode);
     _emailController.clear();
     _passwordController.clear();
@@ -141,21 +142,13 @@ class _EmailSignInFormState extends State<EmailSignInFormBlocBased> {
 
   @override
   Widget build(BuildContext context) {
-    final auth = Provider.of<AuthBase>(context, listen: false);
-    return StreamBuilder<EmailSignInChangeModel>(
-        stream: widget.bloc.modelStream,
-        initialData: EmailSignInChangeModel(auth: auth),
-        builder: (context, snapshot) {
-          final EmailSignInChangeModel model = snapshot.data!;
-          return Padding(
-            padding: const EdgeInsets.all(18.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch, // chìu ngang
-              mainAxisSize:
-                  MainAxisSize.min, // theo chìu dọc bỏ khoảng trắng bớt
-              children: _buildChildren(model),
-            ),
-          );
-        });
+    return Padding(
+      padding: const EdgeInsets.all(18.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch, // chìu ngang
+        mainAxisSize: MainAxisSize.min, // theo chìu dọc bỏ khoảng trắng bớt
+        children: _buildChildren(),
+      ),
+    );
   }
 }
