@@ -23,13 +23,8 @@ class FirestoreDatabase implements Database {
   }
 
   @override
-  Stream<List<Job?>> jobsStream() {
-    final path = APIPath.jobs(uid);
-    final reference = FirebaseFirestore.instance.collection(path);
-    final snapshots = reference.snapshots();
-    return snapshots
-        .map((item) => item.docs.map((e) => Job.formMap(e.data())).toList());
-  }
+  Stream<List<Job?>> jobsStream() => _collectionStream(
+      path: APIPath.jobs(uid), builder: (data) => Job.formMap(data));
 
   Stream<List<T>> _collectionStream<T>(
       {String? path, T Function(Map<String, dynamic> data)? builder}) {
