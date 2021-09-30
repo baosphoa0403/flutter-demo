@@ -1,4 +1,4 @@
-import 'package:demoflutter/home/jobs_page.dart';
+import 'package:demoflutter/home/jobs/jobs_page.dart';
 import 'package:demoflutter/app.sign_in/sign_in.dart';
 import 'package:demoflutter/service/auth.dart';
 import 'package:demoflutter/service/database.dart';

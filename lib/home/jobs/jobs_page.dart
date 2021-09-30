@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demoflutter/common_widgets/show_alert_dialog.dart';
+import 'package:demoflutter/home/jobs/add_job_page.dart';
 import 'package:demoflutter/home/models/job.dart';
 import 'package:demoflutter/service/auth.dart';
 import 'package:demoflutter/service/database.dart';
@@ -46,7 +47,7 @@ class JopsPage extends StatelessWidget {
     // database.readJobs();
     return Scaffold(
       appBar: AppBar(
-        title: Text("Home Page"),
+        title: const Text("Home Page"),
         actions: <Widget>[
           ElevatedButton(
               onPressed: () => confirmSignOut(context),
@@ -60,7 +61,7 @@ class JopsPage extends StatelessWidget {
       // ignore: prefer_const_constructors
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
-        onPressed: () => _createJob(context),
+        onPressed: () => AddJobPage.show(context),
       ),
     );
   }
