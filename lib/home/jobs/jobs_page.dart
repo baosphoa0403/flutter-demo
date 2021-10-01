@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demoflutter/common_widgets/show_alert_dialog.dart';
-import 'package:demoflutter/home/jobs/add_job_page.dart';
+import 'package:demoflutter/home/jobs/edit_job_page.dart';
+import 'package:demoflutter/home/jobs/job_list_title.dart';
 import 'package:demoflutter/home/models/job.dart';
 import 'package:demoflutter/service/auth.dart';
 import 'package:demoflutter/service/database.dart';
@@ -16,9 +17,7 @@ class JopsPage extends StatelessWidget {
       final googleSignIn = GoogleSignIn();
       await googleSignIn.signOut();
       await auth.signOut();
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
   }
 
   Future<void> confirmSignOut(BuildContext context) async {
@@ -29,16 +28,6 @@ class JopsPage extends StatelessWidget {
         cancelActionText: "No");
     if (didRequestSignOut == true) {
       _logoutAnonymous(context);
-    }
-  }
-
-  Future<void> _createJob(BuildContext context) async {
-    try {
-      final database = Provider.of<Database>(context, listen: false);
-      await database.createJob(Job(name: "Blogging", ratePerHours: 10));
-    } on FirebaseException catch (e) {
-      showAlertDialog(context,
-          title: "operation fail", content: e.code, defaultActionText: "ok");
     }
   }
 
@@ -61,7 +50,7 @@ class JopsPage extends StatelessWidget {
       // ignore: prefer_const_constructors
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
-        onPressed: () => AddJobPage.show(context),
+        onPressed: () => EditJobPage.show(context, job: null),
       ),
     );
   }
@@ -73,7 +62,12 @@ class JopsPage extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           final jobs = snapshot.data;
-          final children = jobs!.map((e) => Text(e!.name)).toList();
+          final children = jobs!
+              .map((job) => JobListTitle(
+                    job: job!,
+                    onTap: () => EditJobPage.show(context, job: job),
+                  ))
+              .toList();
           return ListView(
             children: children,
           );
