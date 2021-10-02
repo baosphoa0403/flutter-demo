@@ -1,5 +1,4 @@
 import 'package:demoflutter/app.sign_in/landing.page.dart';
-import 'package:demoflutter/app.sign_in/sign_in.dart';
 import 'package:demoflutter/service/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -39,3 +38,5 @@ class MyApp extends StatelessWidget {
 // separate business logic from: 
 //- layout code
 //- implementation details of external services
+
+// 4 state ui loading data empty error
