@@ -32,6 +32,22 @@ class EmailSignInChangeModel with EmailAndPasswordValidator, ChangeNotifier {
     notifyListeners();
   }
 
+  EmailSignInChangeModel copyWith({
+    required String email,
+    required String password,
+    required EmailSignInFormType formType,
+    required bool isLoading,
+    required bool submitted,
+  }) {
+    return EmailSignInChangeModel(
+        email: email,
+        password: password,
+        formType: formType,
+        isLoading: isLoading,
+        submitted: submitted,
+        auth: Auth());
+  }
+
   void updateEmail(String email) => updateWith(email: email);
   void updatePassword(String password) => updateWith(password: password);
   void toogleFormType() {
