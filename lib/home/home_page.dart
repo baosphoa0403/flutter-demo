@@ -1,5 +1,6 @@
 import 'package:demoflutter/home/account/account_page.dart';
 import 'package:demoflutter/home/cupertino_home_scaffold.dart';
+import 'package:demoflutter/home/entries/entries_page.dart';
 import 'package:demoflutter/home/jobs/jobs_page.dart';
 import 'package:demoflutter/home/tab_item.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,7 @@ class _HomePageState extends State<HomePage> {
   Map<TabItem, WidgetBuilder> get widgetBuilders {
     return {
       TabItem.jobs: (_) => JopsPage(),
-      TabItem.entries: (_) => Container(),
+      TabItem.entries: (_) => EntriesPage.create(context),
       TabItem.account: (_) => const AccountPage(),
     };
   }
