@@ -1,5 +1,6 @@
 import 'package:demoflutter/common_widgets/show_alert_dialog.dart';
 import 'package:demoflutter/common_widgets/show_exception_diaglog.dart';
+import 'package:demoflutter/home/job_entries/job_entries_page.dart';
 import 'package:demoflutter/home/jobs/edit_job_page.dart';
 import 'package:demoflutter/home/jobs/job_list_title.dart';
 import 'package:demoflutter/home/jobs/list_item_builder.dart';
@@ -37,22 +38,19 @@ class JopsPage extends StatelessWidget {
     // database.readJobs();
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Home Page"),
+        title: const Text("Job"),
         actions: <Widget>[
-          ElevatedButton(
-              onPressed: () => confirmSignOut(context),
-              child: const Text(
-                "Logout",
-                style: TextStyle(fontSize: 20.0, color: Colors.white),
+          IconButton(
+              onPressed: () => EditJobPage.show(context,
+                  database: Provider.of<Database>(context, listen: false)),
+              icon: const Icon(
+                Icons.add,
+                color: Colors.white,
               )),
         ],
       ),
       body: _buildContext(context),
       // ignore: prefer_const_constructors
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () => EditJobPage.show(context, job: null),
-      ),
     );
   }
 
@@ -71,7 +69,7 @@ class JopsPage extends StatelessWidget {
     return StreamBuilder<List<Job?>>(
       stream: database.jobsStream(),
       builder: (context, snapshot) {
-        return ListItemBuilder<Job>(
+        return ListItemsBuilder<Job>(
           snapshot: snapshot,
           itemBuilder: (context, job) => Dismissible(
             background: Container(
@@ -82,7 +80,7 @@ class JopsPage extends StatelessWidget {
             onDismissed: (direction) => _delete(context, job),
             child: JobListTitle(
               job: job,
-              onTap: () => EditJobPage.show(context, job: job),
+              onTap: () => JobEntriesPage.show(context, job),
             ),
           ),
         );
