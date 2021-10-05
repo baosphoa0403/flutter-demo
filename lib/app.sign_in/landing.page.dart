@@ -1,3 +1,4 @@
+import 'package:demoflutter/home/home_page.dart';
 import 'package:demoflutter/home/jobs/jobs_page.dart';
 import 'package:demoflutter/app.sign_in/sign_in.dart';
 import 'package:demoflutter/service/auth.dart';
@@ -24,7 +25,7 @@ class LandingPage extends StatelessWidget {
           return Provider<Database>(
               // add database provider
               create: (context) => FirestoreDatabase(uid: user.uid),
-              child: JopsPage());
+              child: HomePage());
         }
         return const Scaffold(
           body: Center(

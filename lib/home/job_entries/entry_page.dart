@@ -1,5 +1,5 @@
 import 'package:demoflutter/common_widgets/show_exception_diaglog.dart';
-import 'package:demoflutter/home/job_entries/date_time_picker.dart';
+import 'package:demoflutter/common_widgets/date_time_picker.dart';
 import 'package:demoflutter/home/job_entries/format.dart';
 import 'package:demoflutter/home/models/entry.dart';
 import 'package:demoflutter/home/models/job.dart';
@@ -20,7 +20,7 @@ class EntryPage extends StatefulWidget {
       required Database database,
       required Job job,
       Entry? entry}) async {
-    await Navigator.of(context).push(
+    await Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(
         builder: (context) =>
             EntryPage(database: database, job: job, entry: entry),

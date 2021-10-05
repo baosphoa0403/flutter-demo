@@ -38,22 +38,19 @@ class JopsPage extends StatelessWidget {
     // database.readJobs();
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Home Page"),
+        title: const Text("Job"),
         actions: <Widget>[
-          ElevatedButton(
-              onPressed: () => confirmSignOut(context),
-              child: const Text(
-                "Logout",
-                style: TextStyle(fontSize: 20.0, color: Colors.white),
+          IconButton(
+              onPressed: () => EditJobPage.show(context,
+                  database: Provider.of<Database>(context, listen: false)),
+              icon: const Icon(
+                Icons.add,
+                color: Colors.white,
               )),
         ],
       ),
       body: _buildContext(context),
       // ignore: prefer_const_constructors
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () => EditJobPage.show(context, job: null),
-      ),
     );
   }
 

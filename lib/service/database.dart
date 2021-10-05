@@ -11,6 +11,7 @@ abstract class Database {
   Future<void> setEntry(Entry entry);
   Future<void> deleteEntry(Entry entry);
   Stream<List<Entry>> entriesStream({Job job});
+  Stream<Job> jobStream({required String jobId});
 }
 
 String documentIDFormCurrentDate() => DateTime.now().toIso8601String();
@@ -60,5 +61,10 @@ class FirestoreDatabase implements Database {
   Future<void> setEntry(Entry entry) => _service.setData(
         path: APIPath.entry(uid, entry.id),
         data: entry.toMap(),
+      );
+  @override
+  Stream<Job> jobStream({required String jobId}) => _service.documentStream(
+        path: APIPath.job(uid, jobId),
+        builder: (data, documentID) => Job.formMap(data!, documentID),
       );
 }
